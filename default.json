@@ -1,0 +1,18 @@
+{   
+    "groups": {
+        "name": "Administrators",
+        "description": "FabLab administrators",
+        "display": 1
+    },
+    "permisions": {
+        "name": "admin",
+        "permittedActions": ["all"]
+    },
+    "users": {
+      "email": "example@example.com",
+      "name": "Admin",
+      "password": "admin",
+      "permission": "*permission",
+      "group": ["*group"]
+    }
+}
