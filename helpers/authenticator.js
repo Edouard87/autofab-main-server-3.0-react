@@ -12,6 +12,7 @@ function authenticate(req, res, next) {
     const token = req.cookies.auth || '';
     try {
         if (!token) {
+            console.log("authentication needed")
             return res.status(401).end();
         }
         const decrypt = jwt.verify(token, process.env.HMACKEY);

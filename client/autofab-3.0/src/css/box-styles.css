@@ -1,0 +1,38 @@
+.selection-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /*float: left;*/
+}
+
+selection-box-container {
+  /*float: left;*/
+}
+
+.selection-box-text {
+  display: inline-block;
+  height: 28px;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.selection-box {
+  width: 40%;
+  height: 70px;
+  background-color: #ffffff;
+  /*border: 3px solid #D00017;*/
+}
+
+.field-header {
+  font-size: 22px;
+  color: rgb(91,95,99);
+}
+
+.selection-box.time-selection {
+  width: 20%;
+}
+
+.btn.btn-primary.submit-button {
+  background-color: #D00017;
+}
+

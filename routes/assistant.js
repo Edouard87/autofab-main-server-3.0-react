@@ -221,7 +221,17 @@ router.post("/database/setdefault", function(req, res) {
       displayName: "popularBlocks",
       key: 3,
       valueArray: []
-    }]
+    }, {
+        userEdit: true,
+        displayName: "openDays",
+        key: 4,
+        valueArray:[1,2,3,4,5] // Default
+      }, {
+        userEdit: true,
+        displayName: "daysInAdvance",
+        key: 5,
+        valueNumber: 28 // Default
+      }]
 
     mongoose.connection.db.listCollections().toArray(function (err, names) {
       if (err) {

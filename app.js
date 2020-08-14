@@ -45,15 +45,15 @@ mongoose.connection.on("error", err => {
 
 const authenticator = require("./helpers/authenticator")
 
-// Routes setup
-
-app.use('/', routes);
+/* * * Routes setup * */
+// No Auth Routes
+app.use('/auth', require("./routes/autoauth")); // Authentication route cannot be locked!
+// Auth Routes
 app.use('/users', authenticator, require('./routes/user'));
-app.use('/auth', require("./routes/autoauth"));
-app.use('/perms', require("./routes/autoperms"));
-app.use('/assistant', require("./routes/assistant"));
-app.use('/blocks', require("./routes/autotime"));
-app.use('/hardware', require("./routes/autohardware"));
+app.use('/perms', authenticator, require("./routes/autoperms"));
+app.use('/assistant', authenticator, require("./routes/assistant"));
+app.use('/blocks', authenticator, require("./routes/autotime"));
+app.use('/hardware', authenticator, require("./routes/autohardware"));
 app.use("/res", authenticator, require("./routes/autoreserve"));
 
 /// catch 404 and forward to error handler

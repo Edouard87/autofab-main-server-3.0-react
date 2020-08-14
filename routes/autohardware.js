@@ -8,9 +8,6 @@ router.get("/types/view", async function(req, res) {
     let queryResult;
     try {
         queryResult = await machineTypes.find(req.query);
-        if (queryResult.length == 1) {
-            queryResult = queryResult[0];
-        }
     } catch(err) {
         res.status(500)
         return res.send(err)

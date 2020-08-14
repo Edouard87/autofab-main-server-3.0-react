@@ -7,7 +7,10 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const users = require("../models/user");
+const bodyParser = require("body-parser")
 require('dotenv').config();
+
+router.use(bodyParser.json());
 
 router.post("/logout", function(req, res) {
     try {
@@ -21,7 +24,7 @@ router.post("/logout", function(req, res) {
     }
 });
 
-router.get("/login", function(req, res) {
+router.post("/login", function(req, res) {
     var passHash = new String();
     var hmac = crypto.createHmac("sha256", process.env.HMACKEY);
     try {
@@ -38,10 +41,18 @@ router.get("/login", function(req, res) {
        console.log(user);
         user.password = undefined;
         const token = jwt.sign({user}, process.env.HMACKEY);
+        // Create auth cookie
         res.cookie(process.env.AUTH_COOKIE_NAME, token, {
           secure: false, // set to true if your using https
-          httpOnly: true,
+          httpOnly: true, // Should be set to true for security reasons
         });
+        // Create an isLoggedIn cookie
+        // This cookie allows the client to know whether or not
+        // it is logged in.
+        res.cookie("isLoggedIn",true, {
+            secure: false,
+            httpOnly: false
+        })
         res.status(200);
         res.end()
     }).catch(err => {

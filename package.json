@@ -21,6 +21,9 @@
     "moment": "^2.27.0",
     "mongoose": "^5.9.23",
     "morgan": "^1.6.1",
+    "react-cookie": "^4.0.3",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "serve-favicon": "^2.3.0"
   },
   "devDependencies": {
