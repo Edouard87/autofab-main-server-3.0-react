@@ -14,12 +14,27 @@ import {
 import { CookiesProvider } from 'react-cookie';
 import { withCookies } from 'react-cookie';
 
+import Confirmation from "./components/Confirmation" 
+
 // Import Componnents
 
 import Nav from './components/Nav'
 import MainContent from "./components/MainContent"
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      machine: null,
+      date: null,
+      blocks: []
+    }
+  }
+  getReservationConfirmation = (data) => {
+    this.setState({
+      ...data
+    });
+  }
   render() {
     return (
       <CookiesProvider>
@@ -28,7 +43,10 @@ class App extends React.Component {
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700" />
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" />
           <Switch>
-            <Route path="/" render={() => (<MainContent cookies={this.props.cookies} />)} />
+            <Route path="/confirmation">
+              <Confirmation reservation={this.state} />
+            </Route>
+            <Route path="/" render={() => (<MainContent getReservationConfirmation={this.getReservationConfirmation} cookies={this.props.cookies} />)} />
           </Switch>
         </Router>
       </CookiesProvider>

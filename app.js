@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const mongoose = require("mongoose")
 
-mongoose.connect('mongodb://localhost/autofab3', {
+mongoose.connect(process.env.MONGODBURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

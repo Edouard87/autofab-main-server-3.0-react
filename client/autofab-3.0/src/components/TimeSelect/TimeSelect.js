@@ -10,6 +10,7 @@ import TimeSelectBox from "./TimeSelectBox"
 import SubsectionHeader from "../general/SubsectionHeader"
 
 class TimeSelect extends React.Component {
+    signal = axios.CancelToken.source();
     constructor(props) {
         super(props);
         this.state = {
@@ -25,20 +26,39 @@ class TimeSelect extends React.Component {
             axios.get("/blocks/view", {
                 params: {
                     machine: this.props.formData.machine,
-                    available: true,
                     date: this.props.formData.date
-                }
+                },
+                cancelToken: this.signal.token
             }).then(res => {
                 console.log("Reloading!", res)
                 this.setState({
                     displayBlocks: res.data
                 })
             }).catch(err => {
+                /**
+                 * Important: err.response.status will be undefined
+                 * if the promise is rejected, which happens when the
+                 * component is unmounted. error.response.status will be
+                 * 499 if the request has been cancelled.
+                 */
+                if (err.message == 499) {
+                    return;
+                }
                 if (err.response.status == 401) {
                     this.props.handle401();
                 }
             })
         }
+    }
+    /**
+     * The componentWillUnmount
+     * is meant to cancel any API calls when
+     * an object unmounts. This is very important,
+     * else there will be a memory leak; a request
+     * is being made, but the result is left unused.
+     */
+    componentWillUnmount() {
+        this.signal.cancel(499);
     }
     render() {
         return (
@@ -48,7 +68,7 @@ class TimeSelect extends React.Component {
                         <SubsectionHeader>Choose a Time Block</SubsectionHeader>
                         {this.state.displayBlocks.map(block => {
                             return (
-                                <TimeSelectBox selectedBlocks={this.props.formData.blocks} handleBlocksChange={this.props.handleBlocksChange} index={block.index} key={block._id} display={{ start: moment(block.start).format("x"), end: moment(block.end).format("x") }} />
+                                <TimeSelectBox selectedBlocks={this.props.formData.blocks} handleBlocksChange={this.props.handleBlocksChange} index={block.index} key={block.index} display={{ start: moment(block.start).format("x"), end: moment(block.end).format("x") }} />
                             )
                         })}
                         

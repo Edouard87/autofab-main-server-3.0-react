@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 class Loading extends React.Component {
     render() {
         return (<div>
-            <Modal onHide={this.props.closeValidationErr} show={this.props.isLoading}>
+            <Modal onHide={this.props.closeValidationErr} show={this.props.show}>
                 <Modal.Header closeButton>
                     <Modal.Title>Processing</Modal.Title>
                 </Modal.Header>

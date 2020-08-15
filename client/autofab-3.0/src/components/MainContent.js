@@ -4,10 +4,11 @@ import TimeSelect from "./TimeSelect/TimeSelect"
 import SubmitButton from "./general/SubmitButton"
 import DateSelect from "./DateSelect/DateSelect"
 import ValidationError from "./errors/ValidationError"
-import Loading from "./general/Loading"
+import Submitting from "./general/Submitting"
 import axios from "axios"
 import ErrorMsg from "./general/ErrorMsg"
 import LoginForm from "./authentication/LoginForm"
+import {Redirect} from "react-router-dom";
 
 class MainContent extends React.Component {
     constructor(props) {
@@ -25,7 +26,9 @@ class MainContent extends React.Component {
             isLoggedIn: true,
             email: "",
             password: "",
-            passwordIncorrect: false
+            passwordIncorrect: false,
+            isSubmitting: false,
+            redirect: ""
         }
         this.handleMachineChange = this.handleMachineChange.bind(this);
         this.handleBlocksChange = this.handleBlocksChange.bind(this);
@@ -58,7 +61,7 @@ class MainContent extends React.Component {
         }
         // Submit
         this.setState({
-            isLoading: true
+            isSubmitting: true
         });
         axios({
             method: 'post',
@@ -70,8 +73,16 @@ class MainContent extends React.Component {
                 description: this.state.justification
             }
         }).then(res => {
+            // Lift the reservation information to state
+            // Reset the state back to normal
+            // this.props.getReservationConfirmation({
+            //     machine: this.state.machine,
+            //     date: this.state.date,
+            //     blocks: [],
+            //     description: this.state.description
+            // });
             this.setState({
-                isLoading: false,
+                redirect: "/confirmation"
             });
         }).catch(err => {
             /* 
@@ -81,6 +92,7 @@ class MainContent extends React.Component {
              * be possible to make a conflcting reservation.
              */
             this.setState({
+                isSubmitting: false,
                 isError: true,
                 errorMessage: "An error occured. Your reservation could not be completed. Please try again later or consult the help documentation."
             })
@@ -220,6 +232,19 @@ class MainContent extends React.Component {
     }
     render() {
         return (<div>
+            {/* Redirect route */}
+            {/* Redirect only if this.state.redirect is truthy */} 
+            <Redirect to={{
+                pathname: this.state.redirect,
+                state: {
+                    machine: this.state.machine,
+                    date: this.state.date,
+                    blocks: this.state.blocks,
+                    justification: this.state.justification
+                }
+            }} />
+            {/* The actual app */}
+            <Submitting show={this.state.isSubmitting} />
             <LoginForm passwordIncorrect={this.state.passwordIncorrect} isLoading={this.state.isLoading} handleLoginFieldEdit={this.handleLoginFieldEdit} email={this.state.email} password={this.state.password} handleLogin={this.handleLogin} isLoggedIn={this.state.isLoggedIn}/>
             <ErrorMsg closeErrorMenu={this.closeErrorMenu} isError={this.state.isError}>{this.state.errorMessage}</ErrorMsg>
             {/* <Loading isLoading={this.state.isLoading} /> */}

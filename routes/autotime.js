@@ -3,51 +3,57 @@ const router = express.Router();
 
 const blocks = require("../models/block");
 const siteOps = require("../models/siteoption");
-const milsPastMidnightToUnixTime = require("../helpers/milsPastMidnightToUnixTime");
+const milsPastMidnightToUnixTime = require("../helpers/milsAfterMidnightToUnixTime");
+const indexToMilsAfterMidnight = require("../helpers/indexToMilsAfterMidnight");
 const moment = require("moment")
+const reservations = require("../models/reservation2");
 
+Set.prototype.difference = require("../helpers/sets/difference");
+
+/**
+ * Current:
+ * Expects a query to determine what should be sent
+ * Passing an empty query returns everything.
+ * Future:
+ * The special query showRecmmended will only show
+ * the blocks that were configured and set to recommended.
+ * If popularOptions has not been configured, send an error
+ * that the configuration was not made (404)
+ */
 router.get("/view", async function(req, res) {
-    console.log("request is: ", req.query)
-    // Expects a query to determine what should be sent
-    // Passing an empty query returns everything
-    // The special query showRecmmended will only show
-    // the blocks that were configured and set to recommended.
-    // If popularOptions has not been configured, send an error
-    // that the configuration was not made (404)
-    let searchQuery = new Object();
-    if (req.query.showRecommended) {
-        // Find popular options
-        let popularOptions = await siteOps.findOne({key: 3})
-        if (popularOptions.valueArray.length == 0) {
-            res.status(404); // No popular options have been configured
-            return res.end();
-        }
-       searchQuery = {
-           index: {
-             $in: popularOptions.valueArray
-           }
-        }
-    } else {
-        // show what the user wants to see
-        searchQuery = req.query
+    // Make sure that date is correct
+    let dateFormat = new RegExp(process.env.DATE_FORMAT);
+    if (!dateFormat.test(req.query.date)) {
+        res.status(400);
+        return res.end();
     }
-    blocks.find(searchQuery).then(foundBlocks => {
-        // We found everything
-        let betterBlocks = new Array();
-        foundBlocks.map(oneBlock => {
-            betterBlocks.push({
-                ...oneBlock._doc,
-                start: milsPastMidnightToUnixTime(oneBlock.startMilsPastMidnight),
-                end: milsPastMidnightToUnixTime(oneBlock.endMilsPastMidnight)
-            })
+    // Create a set with all open indexes in the day
+    let openBlocks = await siteOps.findOne({ key: 2 });
+    let openBlocksSet = new Set();
+    for (let block of openBlocks.valueArray) {
+        openBlocksSet.add(block);
+    }
+    // Get all reservations for that day and machine
+    let allRes = await reservations.find({date: req.query.date, machine: req.query.machine});
+    // Remove all reservatons from the open blocks
+    for (let activeRes of allRes) {
+        for (let block of activeRes.get('blocks')) {
+            openBlocksSet.delete(block);
+        }
+    }
+    // Format the open blocks array
+    let milsPerBlock = (await siteOps.findOne({ key: 0 })).valueNumber
+    let returnBlocks = [];
+    for (let block of openBlocksSet) {
+        returnBlocks.push({
+            index: block,
+            start: milsPastMidnightToUnixTime(await indexToMilsAfterMidnight(block), req.query.date),
+            end: milsPastMidnightToUnixTime(await indexToMilsAfterMidnight(block) + milsPerBlock, req.query.date)
         })
-        res.status(200)
-        res.send(betterBlocks)
-    }).catch(err => {
-        // The server encountered an exception
-        res.status(500)
-        res.send(err)
-    })
+    }
+    // Return the open blocks array
+    res.status(200);
+    res.send(returnBlocks);
 });
 
 router.get("/days/view", async (req, res) => {
@@ -65,7 +71,7 @@ router.get("/days/view", async (req, res) => {
             dayIndex = 0;
         }
         if (openDays.valueArray.includes(dayIndex)) {
-            let day = moment().add(i, 'd').format('MM/DD/yyy');
+            let day = moment().add(i, 'd').format('MM-DD-yyy');
             dateSelector.push(day);
         }
         dayIndex++;
