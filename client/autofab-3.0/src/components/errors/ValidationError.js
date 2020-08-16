@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 class ValidationError extends React.Component {
     render() {
         return (<div>
-            <Modal onHide={this.props.closeValidationErr} show={this.props.show}>
+            <Modal onHide={this.props.closeModal} show={this.props.show}>
                 <Modal.Header closeButton>
                     <Modal.Title>Validation Error</Modal.Title>
                 </Modal.Header>
@@ -14,7 +14,7 @@ class ValidationError extends React.Component {
                     <Button variant="secondary">
                         Help
                     </Button>
-                    <Button onClick={this.props.closeValidationErr} variant="primary">
+                    <Button onClick={this.props.closeModal} variant="primary">
                         Okay
                     </Button>
                 </Modal.Footer>

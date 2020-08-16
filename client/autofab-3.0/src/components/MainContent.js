@@ -3,10 +3,7 @@ import BasicInfo from "./BasicInfo/BasicInfo"
 import TimeSelect from "./TimeSelect/TimeSelect"
 import SubmitButton from "./general/SubmitButton"
 import DateSelect from "./DateSelect/DateSelect"
-import ValidationError from "./errors/ValidationError"
-import Submitting from "./general/Submitting"
 import axios from "axios"
-import ErrorMsg from "./general/ErrorMsg"
 import LoginForm from "./authentication/LoginForm"
 import {Redirect} from "react-router-dom";
 
@@ -18,51 +15,29 @@ class MainContent extends React.Component {
             blocks: [],
             date: null,
             justification: null,
-            validationError: false,
             isLoading: false,
-            isError: false,
             isLoggedIn: true, // Starts out as true to make the dialogue nicer
-            errorMessage: "",
             isLoggedIn: true,
             email: "",
             password: "",
             passwordIncorrect: false,
-            isSubmitting: false,
-            redirect: ""
+            redirect: "",
+            modal: null
         }
         this.handleMachineChange = this.handleMachineChange.bind(this);
         this.handleBlocksChange = this.handleBlocksChange.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.closeValidationErr = this.closeValidationErr.bind(this);
-    }
-    closeValidationErr() {
-        this.setState({
-            validationError: false
-        })
-    }
-    showValidationErr = () => {
-        this.setState({
-            validationError: true
-        })
-    }
-    closeErrorMenu = () => {
-        this.setState({
-            isError: false,
-            errorMessage: ""
-        })
     }
     handleSubmit() {
         // Validate
         if (this.state.machine == null || this.state.blocks.length == 0 || this.state.date == null || this.state.justification == null) {
-            this.showValidationErr();
+            this.props.changeModal("ValidationError");
             return;
         }
         // Submit
-        this.setState({
-            isSubmitting: true
-        });
+        this.props.changeModal("Submitting");
         axios({
             method: 'post',
             url: '/res/new',
@@ -73,14 +48,11 @@ class MainContent extends React.Component {
                 description: this.state.justification
             }
         }).then(res => {
-            // Lift the reservation information to state
-            // Reset the state back to normal
-            // this.props.getReservationConfirmation({
-            //     machine: this.state.machine,
-            //     date: this.state.date,
-            //     blocks: [],
-            //     description: this.state.description
-            // });
+            /**
+             * Redirect the user to the
+             * confirmation page.
+             */
+            this.props.closeModal()
             this.setState({
                 redirect: "/confirmation"
             });
@@ -91,11 +63,7 @@ class MainContent extends React.Component {
              * Note that conflicts should never occur as it should not even
              * be possible to make a conflcting reservation.
              */
-            this.setState({
-                isSubmitting: false,
-                isError: true,
-                errorMessage: "An error occured. Your reservation could not be completed. Please try again later or consult the help documentation."
-            })
+            this.props.changeModal("ErrorMsg","An error occured. Your reservation could not be completed. Please try again later or consult the help documentation.")
         });
     }
     handleChange(ev) {
@@ -244,11 +212,8 @@ class MainContent extends React.Component {
                 }
             }} />
             {/* The actual app */}
-            <Submitting show={this.state.isSubmitting} />
             <LoginForm passwordIncorrect={this.state.passwordIncorrect} isLoading={this.state.isLoading} handleLoginFieldEdit={this.handleLoginFieldEdit} email={this.state.email} password={this.state.password} handleLogin={this.handleLogin} isLoggedIn={this.state.isLoggedIn}/>
-            <ErrorMsg closeErrorMenu={this.closeErrorMenu} isError={this.state.isError}>{this.state.errorMessage}</ErrorMsg>
             {/* <Loading isLoading={this.state.isLoading} /> */}
-            <ValidationError closeValidationErr={this.closeValidationErr} show={this.state.validationError}/>
             <div style={this.props.isLoggedIn ? {display: "none"} : {display: "block" }}>
                 <BasicInfo handle401={this.handle401} isLoggedIn={this.state.isLoggedIn} handleChange={this.handleChange} justification={this.props.justification} selectedMachine={this.state.machine} handleMachineChange={this.handleMachineChange} />
                 <DateSelect handle401={this.handle401} isLoggedIn={this.state.isLoggedIn} selectedDate={this.state.date} handleDateChange={this.handleDateChange} />

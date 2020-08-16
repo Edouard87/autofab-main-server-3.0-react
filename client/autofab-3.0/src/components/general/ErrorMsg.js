@@ -5,13 +5,13 @@ import Modal from 'react-bootstrap/Modal'
 class ErrorMsg extends React.Component {
     render() {
         return (<div>
-            <Modal onHide={this.props.closeErrorMenu} show={this.props.isError}>
+            <Modal onHide={this.props.closeModal} show={this.props.show}>
                 <Modal.Header closeButton>
                     <Modal.Title>Error</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>{this.props.children}</Modal.Body>
+                <Modal.Body>{this.props.modalText}</Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={this.props.closeErrorMenu} variant="primary">
+                    <Button onClick={this.props.closeModal} variant="primary">
                         Close
                     </Button>
                     <Button variant="secondary">

@@ -14,7 +14,7 @@ class Nav extends React.Component {
                                     <div className="col text-center"><span className="text-center" style={{ color: 'rgb(255,255,255)', fontSize: '28px' }}>ADMIN</span></div>
                                 </div>
                                 <div className="row">
-                                    <div className="col text-center"><span style={{ color: 'rgb(255,255,255)' }}>Log &nbsp;Out</span></div>
+                                    <div className="col text-center"><span onClick={this.props.logoutClicked} style={{ color: 'rgb(255,255,255)' }}>Log Out</span></div>
                                     <div className="col text-center my-auto" style={{ verticalAlign: 'middle' }}><span style={{ color: 'rgb(255,255,255)' }}>Admin Panel</span></div>
                                 </div>
                             </Container>

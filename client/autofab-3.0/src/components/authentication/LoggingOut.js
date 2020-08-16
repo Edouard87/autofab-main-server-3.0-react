@@ -1,13 +1,12 @@
-import React from 'react';
-import Button from 'react-bootstrap/Button'
-import Modal from 'react-bootstrap/Modal'
+import React from "react"
+import {Modal, Button} from "react-bootstrap"
 
-class Loading extends React.Component {
+class LoggingOut extends React.Component {
     render() {
         return (<div>
-            <Modal show={this.props.show} backdrop="static">
+            <Modal onHide={this.props.closeModal} show={this.props.show}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Processing</Modal.Title>
+                    <Modal.Title>Logging you out</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>Please wait. If nothing happens, <a href="#">get help</a>.</Modal.Body>
                 <Modal.Footer>
@@ -19,4 +18,4 @@ class Loading extends React.Component {
     }
 }
 
-export default Loading
+export default LoggingOut
