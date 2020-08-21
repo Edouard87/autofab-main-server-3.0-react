@@ -10,6 +10,17 @@ const env = process.env.NODE_ENV || 'development';
 app.locals.ENV = env;
 app.locals.ENV_DEVELOPMENT = env == 'development';
 
+/**
+ * Check to make sure that
+ * there is a mongoDB URI to
+ * connect to, else the server
+ * will crash.
+ */
+
+if (!process.env.MONGODBURI) app.get("*", (req, res) => {
+    res.send("A mongoDB URI must be specified for the server to run. Please configure a MONGODBURI and add it to your server's environment variables with the key 'MONGODBURI'")
+})
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
