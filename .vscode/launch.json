@@ -5,6 +5,43 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "9999",
+                "--colors",
+                "${workspaceFolder}/server/test/autoreserve"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "name": "Autoreserve Tests",
+            "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
+            "args": [
+                "--recursive",
+                "-u",
+                "tdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}/test"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "name": "Run Global Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
             "name": "Attach to Chrome",
             "port": 9222,
             "request": "attach",
@@ -26,7 +63,28 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/app.js"
+            "cwd": "${workspaceFolder}/server",
+            "program": "${workspaceFolder}/server/index.js"
+        },
+        {
+            "name": "Debug Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "${workspaceRoot}/client/node_modules/.bin/react-scripts",
+            "args": [
+                "test",
+                "--runInBand",
+                "--no-cache",
+                "--watchAll=false"
+            ],
+            "cwd": "${workspaceRoot}/client",
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "CI": "true"
+            },
+            "disableOptimisticBPs": true
         }
     ]
 }

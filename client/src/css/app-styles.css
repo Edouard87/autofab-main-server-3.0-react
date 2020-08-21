@@ -1,0 +1,44 @@
+textarea {
+  width: 100%;
+  border: 3px solid #d00017;
+  resize: none;
+  height: 86px;
+}
+.red-border {
+  border: 3px solid rgb(208, 0, 23);
+}
+
+.red-fill {
+  background-color: rgb(208, 0, 23);
+  color: #FFFFFF;
+}
+
+.red-text {
+  color: rgb(208, 0, 23) !important;
+}
+
+.green-fill {
+  background-color: rgb(65,141,119);
+}
+
+.white-text {
+  color: white !important;
+}
+
+.green-button {
+  border: 3px solid white;
+  color: white;
+}
+
+.white-button {
+  color: rgb(65,141,119);
+  background-color: white;
+}
+
+.white-fill {
+  background-color: white
+}
+
+.orange-fill {
+  background-color: #FF7900;
+}
