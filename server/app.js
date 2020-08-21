@@ -16,7 +16,15 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ * Build path must be in server directory. It cannot be
+ * in the client directory.
+ */
+let buildpath = path.join(__dirname,"build");
+
+app.use(express.static(buildpath));
+app.use(express.static("public"));
 
 // Agenda setup
 
@@ -62,8 +70,14 @@ app.use("/res", authenticator, require("./routes/autoreserve"));
  * original code (Babel transpiles ES6 JS to ES5 for better
  * portability).
  */
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+
+ /**
+  * The server must serve all other routes with the client so
+  * that client-side routing with react-router can work, else
+  * the server will fail and respond with 404 errors.
+  */
+app.get('/*', (req, res) => {
+    res.sendFile(buildpath);
 });
 
 /// catch 404 and forward to error handler
