@@ -18,7 +18,7 @@ app.locals.ENV_DEVELOPMENT = env == 'development';
  */
 
 if (!process.env.MONGODBURI) app.get("*", (req, res) => {
-    res.send("A mongoDB URI must be specified for the server to run. Please configure a MONGODBURI and add it to your server's environment variables with the key 'MONGODBURI'")
+    throw new Error("A mongoDB URI must be specified for the server to run. Please configure a MONGODBURI and add it to your server's environment variables with the key 'MONGODBURI'")
 })
 
 app.use(logger('dev'));
@@ -32,7 +32,7 @@ app.use(cookieParser());
  * Build path must be in server directory. It cannot be
  * in the client directory.
  */
-let buildpath = path.join(__dirname,"build");
+let buildpath = path.join(__dirname,"build",'index.html');
 
 app.use(express.static(buildpath));
 app.use(express.static("public"));
@@ -63,6 +63,14 @@ db.connect();
 
 const authenticator = require("./helpers/authenticator")
 
+/**
+ * The below line must be included for the data to be rendered properly.
+ * Else, the scripts to run the UI will return HTML 404 errors, which will
+ * cause syntax error by the client's JS interpreter.
+ */
+
+app.use(express.static(path.join(__dirname, 'build')));
+
 /* * * Routes setup * */
 // No Auth Routes
 app.use('/auth', require("./routes/autoauth")); // Authentication route cannot be locked!
@@ -87,7 +95,8 @@ app.use("/res", authenticator, require("./routes/autoreserve"));
   * that client-side routing with react-router can work, else
   * the server will fail and respond with 404 errors.
   */
-app.get('/*', (req, res) => {
+
+app.get('*', function (req, res) {
     res.sendFile(buildpath);
 });
 
