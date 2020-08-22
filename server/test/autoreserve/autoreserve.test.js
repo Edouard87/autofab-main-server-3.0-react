@@ -5,6 +5,15 @@ const moment = require("moment");
 const tk = require("timekeeper");
 const chaiAsPromised = require("chai-as-promised");
 const agenda = require("../../agenda");
+const path = require("path");
+/**
+ * Allows the computer to
+ * find .env. Only works if this test 
+ * is run as a test.
+ */
+require("dotenv").config({
+    path: path.join(__dirname, "../../..", ".env")
+})
 
 /**
  * chaiAsPromised is used to handle
@@ -20,6 +29,7 @@ const users = require("../../models/user");
 const machines = require("../../models/machines");
 const autoreserve = require("../../classes/autoreserve");
 
+
 describe("Creates a reservation", function() {
     before(function(done) {
         /**
@@ -32,12 +42,12 @@ describe("Creates a reservation", function() {
         })
     })
     before(function(done) {
-        mongoose.connect("mongodb://localhost/autofab3", {
+        mongoose.connect(process.env.MONGODBURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
         mongoose.connection.on("error", function() {
-            console.log(err);
+            throw new Error("Mongoose connection failed");
         });
         let called = false;
         mongoose.connection.on("connected", function() {
@@ -144,7 +154,27 @@ describe("Creates a reservation", function() {
         // Skip forward in time
         tk.travel(later);
         // try to mark as completed
-        expect(autoreserve.setStarted(this.user)).to.eventually.be.rejected;
+        return expect(autoreserve.setStarted(this.user)).to.eventually.be.rejected;
+    });
+    it("Edge case: Past reservations", async function() {
+        /**
+         * Creating a reservation in the past is not allowed
+         */
+        // Set time to 
+        // Mon Aug 10 2020 GMT-0400 (GMT-04:00)
+        let now = 1597071600000; // 10:00:00 AM
+        tk.freeze(now);
+        blocks = [8, 9, 10]; // Reserving multiple, including one that is in the past
+        /**
+         * Note that the value of 'expect' must be
+         * returned by the teste, else it will always
+         * pass.
+         */
+        return expect(autoreserve.new(this.user,
+            moment().format("MM-DD-YYYY"),
+            this.machine,
+            blocks,
+            "test")).to.eventually.be.rejected;
     });
     it("Should create a reservation, but never mark it as started", function(done) {
         // /**

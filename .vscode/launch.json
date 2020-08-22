@@ -24,6 +24,24 @@
         },
         {
             "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "9999",
+                "--colors",
+                "${workspaceFolder}/server/test/autotime"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "name": "Autotime Tests",
+            "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
+            "args": [
                 "--recursive",
                 "-u",
                 "tdd",

@@ -21,12 +21,18 @@ const autoreserve = {
      * @param {array} blocks - The blocks requested by the user
      * @param {string} description - The reason for the reservation
      * returns 200 if fulfilled and okay and will reject with error if there is an error. 
+     * 
+     * Reservations cannot be made for dates that are in the past
      */
     new: async function(user, date, machine, blocks, description) {
         // The new block checking method –– find all reservations for that day
         // Note that the date should have dashes. Make sure it does
 
         // Verify that there are no conflicts
+
+        // Make sure that the reservaton is after the current time
+
+        // Make sure that all indexes are greater than this block
 
         // Find all reservations
         let allRes = await reservations.find({ date: date, machine: machine });

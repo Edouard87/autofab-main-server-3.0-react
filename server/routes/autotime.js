@@ -1,3 +1,9 @@
+/**
+ * The router's job is to plug the correct
+ * values into the class and to relay the information
+ * returned by the class to the user.
+ */
+
 const express = require("express");
 const router = express.Router();
 
@@ -10,10 +16,13 @@ const reservations = require("../models/reservation2");
 
 Set.prototype.difference = require("../helpers/sets/difference");
 
+const autotime = require("../classes/autotime");
+
 /**
  * Current:
  * Expects a query to determine what should be sent
- * Passing an empty query returns everything.
+ * Passing an empty query returns everything. Returns
+ * the times the user can select.
  * Future:
  * The special query showRecmmended will only show
  * the blocks that were configured and set to recommended.
@@ -21,39 +30,12 @@ Set.prototype.difference = require("../helpers/sets/difference");
  * that the configuration was not made (404)
  */
 router.get("/view", async function(req, res) {
-    // Make sure that date is correct
-    let dateFormat = new RegExp(process.env.DATE_FORMAT);
-    if (!dateFormat.test(req.query.date)) {
-        res.status(400);
-        return res.end();
+    try {
+        res.send(await autotime.viewAll(req.query.date, req.query.machine));
+    } catch(err) {
+        res.status(500);
+        res.end();
     }
-    // Create a set with all open indexes in the day
-    let openBlocks = await siteOps.findOne({ key: 2 });
-    let openBlocksSet = new Set();
-    for (let block of openBlocks.valueArray) {
-        openBlocksSet.add(block);
-    }
-    // Get all reservations for that day and machine
-    let allRes = await reservations.find({date: req.query.date, machine: req.query.machine});
-    // Remove all reservatons from the open blocks
-    for (let activeRes of allRes) {
-        for (let block of activeRes.get('blocks')) {
-            openBlocksSet.delete(block);
-        }
-    }
-    // Format the open blocks array
-    let milsPerBlock = (await siteOps.findOne({ key: 0 })).valueNumber
-    let returnBlocks = [];
-    for (let block of openBlocksSet) {
-        returnBlocks.push({
-            index: block,
-            start: milsPastMidnightToUnixTime(await indexToMilsAfterMidnight(block), req.query.date),
-            end: milsPastMidnightToUnixTime(await indexToMilsAfterMidnight(block) + milsPerBlock, req.query.date)
-        })
-    }
-    // Return the open blocks array
-    res.status(200);
-    res.send(returnBlocks);
 });
 
 router.get("/days/view", async (req, res) => {

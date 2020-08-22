@@ -4,8 +4,9 @@ const machines = require('../models/machines');
 const ops = require("../models/siteoption");
 const users = require("../models/user");
 
-const milsPastMidnightToUnixTime = require("../helpers/milsAfterMidnightToUnixTime")
+const milsPastMidnightToUnixTime = require("../helpers/milsAfterMidnightToUnixTime");
 const indexToMilsAfterMidnight = require("../helpers/indexToMilsAfterMidnight");
+const getSmallestPossibleIndex = require("../helpers/getSmallestPossibleIndex");
 
 const resSchema = mongoose.Schema({
     machine: String,
@@ -136,6 +137,15 @@ resSchema.pre('save', async function(next) {
           return next(new Error("Time blocks must be sequential"))
         }
         previousBlock = currentBlock;
+    }
+    // Then, we make sure that the blocks are all in the future
+    // * Get the current time
+    let now = moment();
+    // * Convert this time to an index of a block
+    let smallestPossibleIndex = await getSmallestPossibleIndex(now);
+    // Make sure that the first block of the sorted index is greater than this index
+    if (this.blocks[0] < smallestPossibleIndex) {
+      return new mongoose.Error.ValidationError("Not allowed to reserve in the past");
     }
     // Then we generate the start and end times
     /**
